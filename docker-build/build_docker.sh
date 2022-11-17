@@ -104,7 +104,8 @@ packaging_fateboard() {
     fateboard_version=$(grep -E -m 1 -o "<version>(.*)</version>" ./pom.xml | tr -d '[\\-a-z<>//]' | awk -F "version" '{print $2}')
     echo "[INFO] fateboard version "${fateboard_version}
         
-    docker run --rm -u $(id -u):$(id -g) -v ${source_dir}/fateboard:/data/projects/fate/fateboard --entrypoint="" maven:3.6-jdk-8 /bin/bash -c "cd /data/projects/fate/fateboard && mvn clean package -DskipTests"
+    docker run --rm -u $(id -u):$(id -g) -v ${source_dir}/fateboard:/data/projects/fate/fateboard --entrypoint="" maven:3.6-jdk-8 /bin/bash -c "cd /data/projects/fate/fateboard && 
+        mvn clean package -DskipTests -Dhttp.proxyHost=child-prc.intel.com -Dhttp.proxyPort=913 -Dhttps.proxyHost=child-prc.intel.com -Dhttps.proxyPort=913"
     mkdir -p ${package_dir}/fateboard/conf
     mkdir -p ${package_dir}/fateboard/ssh
     cp ./target/fateboard-${fateboard_version}.jar ${package_dir}/fateboard/
@@ -132,12 +133,13 @@ packaging_eggroll() {
 
 packaging_ipcl_pkg(){
     echo "[INFO] package ipcl_pkg start"
-    if [[ ! -d ${IPCL_PKG_DIR} ]] 
-    then
-        git clone --single-branch -b ${IPCL_VERSION}  https://github.com/intel/pailliercryptolib_python ${IPCL_PKG_DIR}
-    fi
-    mkdir -p ${package_dir}/ipcl_pkg
-    cp -r ${IPCL_PKG_DIR}/* ${package_dir}/ipcl_pkg/
+    # if [[ ! -d ${IPCL_PKG_DIR} ]] 
+    # then
+    #     git clone --single-branch -b ${IPCL_VERSION}  https://github.com/intel/pailliercryptolib_python ${IPCL_PKG_DIR}
+    # fi
+    # mkdir -p ${package_dir}/ipcl_pkg
+    git clone --single-branch -b ${IPCL_VERSION} https://github.com/intel/pailliercryptolib_python ${package_dir}/ipcl_pkg
+    # cp -r ${IPCL_PKG_DIR}/* ${package_dir}/ipcl_pkg/
 
     echo "[INFO] package ipcl_pkg done"
 }

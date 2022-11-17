@@ -4,3 +4,4 @@
 /.env
 /cos.yaml
 *.log
+cache
